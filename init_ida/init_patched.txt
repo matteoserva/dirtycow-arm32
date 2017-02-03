@@ -1,0 +1,106 @@
+.text:00009248 bootchart_sample
+.text:00009248 PUSH.W          {R4-R11,LR}
+.text:0000924C NOP
+.text:0000924E NOP
+.text:00009250 NOP
+.text:00009252 NOP
+.text:00009254 NOP
+.text:00009256 SUB             SP, SP, #0x80
+.text:00009258
+.text:00009258 loc_9258
+.text:00009258 MOVS            R1, #0x41
+.text:0000925A MOV             R0, PC
+.text:0000925C ADDS            R0, #0xC
+.text:0000925E MOVS            R2, #0x3F
+.text:00009260 MOVS            R7, #5
+.text:00009262 SVC             0
+.text:00009264 STR             R0, [SP,#0x360+var_35C]
+.text:00009266 B               loc_9280
+.text:00009268 ; ---------------------------------------------------------------------------
+.text:00009268 NOP
+.text:0000926A STRB            R7, [R5,#12]
+.text:0000926C STRB            R1, [R7,#0xD]
+.text:0000926E STR             R7, [R5,#0x60]
+.text:00009270 CMP             R7, #0x73
+.text:00009272 STR             R3, [R6,#0x54]
+.text:00009274 LDR             R4, [R5,#0x14]
+.text:00009276 STRB            R6, [R5,#0x15]
+.text:00009278
+.text:00009278 loc_9278
+.text:00009278 CMP             R7, #0x78
+.text:0000927A LDR             R4, [R5,#0x74]
+.text:0000927C STR             R1, [R4,#68]
+.text:0000927E MOVS            R0, R0
+.text:00009280
+.text:00009280 loc_9280
+.text:00009280 MOVS            R1, #0
+.text:00009282 MOV             R0, PC
+.text:00009284 ADDS            R0, #0xC
+.text:00009286 MOVS            R2, #0x3F
+.text:00009288 MOVS            R7, #5
+.text:0000928A SVC             0
+.text:0000928C STR             R0, [SP,#0x360+var_358]
+.text:0000928E B               loc_92AC
+.text:00009290 ; ---------------------------------------------------------------------------
+.text:00009290 NOP
+.text:00009292 STR             R7, [R5,#0x40]
+.text:00009294 STRB            R1, [R4,#0x11]
+.text:00009296 CMP             R7, #0x61
+.text:00009298 LDR             R4, [R5,#0x74]
+.text:0000929A STR             R3, [R4,#0x14]
+.text:0000929C CMP             R7, #0x6C
+.text:0000929E LDR             R4, [R6,#0x54]
+.text:000092A0 CMP             R7, #0x70
+.text:000092A2 STR             R3, [R6,#0x54]
+.text:000092A4 LDR             R0, [R6,#0x74]
+.text:000092A6 LDR             R4, [R5,#0x14]
+.text:000092A8 LDRB            R3, [R4,#5]
+.text:000092AA MOVS            R0, R0
+.text:000092AC
+.text:000092AC loc_92AC
+.text:000092AC LDR             R0, [SP,#0x360+var_358]
+.text:000092AE MOVS            R1, #0
+.text:000092B0 MOVS            R2, #2
+.text:000092B2
+.text:000092B2 loc_92B2
+.text:000092B2 MOVS            R7, #0x13
+.text:000092B4 SVC             0
+.text:000092B6 STR             R0, [SP,#(unk_CE6B4 - unk_CE6A8)]
+.text:000092B8 LDR             R0, [SP,#0x360+var_358]
+.text:000092BA MOVS            R1, #0
+.text:000092BC MOVS            R2, #0
+.text:000092BE MOVS            R7, #0x13
+.text:000092C0 SVC             0
+.text:000092C2 MOVS            R0, #0
+.text:000092C4 LDR             R1, [SP,#0x360+var_354]
+.text:000092C6 MOVS            R2, #1
+.text:000092C8 MOVS            R3, #2
+.text:000092CA LDR             R4, [SP,#0x360+var_358]
+.text:000092CC MOVS            R5, #0
+.text:000092CE MOVS            R7, #0xC0
+.text:000092D0 SVC             0
+.text:000092D2 STR             R0, [SP,#0x360+var_350]
+.text:000092D4 LDR             R0, [SP,#0x360+var_35C]
+.text:000092D6 LDR             R1, [SP,#0x360+var_350]
+.text:000092D8 LDR             R2, [SP,#0x360+var_354]
+.text:000092DA MOVS            R7, #4
+.text:000092DC SVC             0
+.text:000092DE NOP
+.text:000092E0 NOP
+.text:000092E2 LDR             R0, [SP,#0x360+var_350]
+.text:000092E4 LDR             R1, [SP,#0x360+var_354]
+.text:000092E6 MOVS            R7, #0x5B
+.text:000092E8 SVC             0
+.text:000092EA LDR             R0, [SP,#0x360+var_358]
+.text:000092EC MOVS            R7, #6
+.text:000092EE SVC             0
+.text:000092F0 LDR             R0, [SP,#0x360+var_35C]
+.text:000092F2 MOVS            R7, #6
+.text:000092F4 SVC             0
+.text:000092F6 ADD             SP, SP, #0x80
+.text:000092F8 NOP
+.text:000092FA NOP
+.text:000092FC POP.W           {R4-R11,PC}
+.text:00009300 ; ---------------------------------------------------------------------------
+.text:00009300 NOP
+.text:00009302 NOP
