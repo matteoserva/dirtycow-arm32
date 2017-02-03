@@ -5,25 +5,25 @@ This short guide will explain how I got unrestricted root access on my phone.
 It should work for any arm32 android with dirtyc0w support
 
 required software:
-	arm compiler toolchain, I suggest the android-ndk-compiler
-	android libsepol: https://android.googlesource.com/platform/external/libsepol
-  adb, android debug bridge
+* arm compiler toolchain, I suggest the android-ndk-compiler
+* android libsepol: https://android.googlesource.com/platform/external/libsepol
+* adb, android debug bridge
 
 suggested software:
-	ida pro. Demo version is fine
+* ida pro. Demo version is fine
 
 required skills:
-	compiling software for android
-	basic assembly knowledge
+* compiling software for android
+* basic assembly knowledge
 
 suggested skills:
-	writing arm shellcode
+* writing arm shellcode
 
 thanks:
-	https://www.redtile.io/security/galaxy/
-	https://github.com/freddierice/trident
-	https://github.com/timwr/CVE-2016-5195
-	https://github.com/phhusson/sepolicy-inject
+* https://www.redtile.io/security/galaxy/
+* https://github.com/freddierice/trident
+* https://github.com/timwr/CVE-2016-5195
+* https://github.com/phhusson/sepolicy-inject
 
 
 STEPS:
