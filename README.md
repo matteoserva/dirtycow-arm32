@@ -26,10 +26,10 @@ thanks:
 	https://github.com/phhusson/sepolicy-inject
 
 
-= STEPS:
-	1)	Obtain read access to /init
-	2)  Patch /init
-	3)  Replace policy
+STEPS:
+* Obtain read access to /init
+* Patch /init
+* Replace policy
 
 
 # Obtain read access to /init
@@ -47,53 +47,52 @@ Once you have access to init, copy it on your sdcard, then use adb pull to recov
 
 # Patch /init
 
-	This is the difficult part, you need to find the function bootchart_sample() to patch it.
+ This is the difficult part, you need to find the function bootchart_sample() to patch it.
 
-	Open /init in ida pro and compare it with the source code.
-	For android marshmallow the source is on google repository:
-	https://android.googlesource.com/platform/system/core/+/android-6.0.1_r78/init/init.cpp
-	My /init used branches to exit from some functions and IDA couldn't analyze them, I solved that by manually setting the end of the function( Edit/Functions/set function end)
+ Open /init in ida pro and compare it with the source code.
+ For android marshmallow the source is on google repository:
+ https://android.googlesource.com/platform/system/core/+/android-6.0.1_r78/init/init.cpp
+ My /init used branches to exit from some functions and IDA couldn't analyze them, I solved that by manually setting the end of the function( Edit/Functions/set function end)
 
-	The bootchart_sample() should look like the one in the /init_ida directory.
+ The bootchart_sample() should look like the one in the /init_ida directory.
 
-  Now it's time to compile the shellcode.
+ Now it's time to compile the shellcode.
 
-	The shellcode is in the /shellcode directory
+ The shellcode is in the /shellcode directory
 
-  To compile I used gcc: arm-linux-androideabi-as shellcode.s
+ To compile I used gcc: arm-linux-androideabi-as shellcode.s
 
-	The relevant part is between AAAAINIT and AAAAFINE. Ignore the forkexec code, I used it for debugging to execute my shellcode in a child process without killing the orinal init.
+ The relevant part is between AAAAINIT and AAAAFINE. Ignore the forkexec code, I used it for debugging to execute my shellcode in a child process without killing the orinal init.
 
-	Open the compiled shellcode in a hex editor and copy the relevant part, use the strings AAAAINIT and AAAAFINE to locate it.
+ Open the compiled shellcode in a hex editor and copy the relevant part, use the strings AAAAINIT and AAAAFINE to locate it.
 
-  Open your init file and copy the shellcode just after the prologue of the bootchart_sample() function.
+ Open your init file and copy the shellcode just after the prologue of the bootchart_sample() function.
 
-	The result should look like the image in the /init_ida directory.
+The result should look like the image in the /init_ida directory.
 
-	Since we don't want to crash /init, you also have to manually add the epilogue.
+Since we don't want to crash /init, you also have to manually add the epilogue.
 
-	My bootchart_sample() process started with a "PUSH.W          {R4-R11,LR}" so I added a "POP.W           {R4-R11,PC}; NOP" at the end of the shellcode.
+My bootchart_sample() process started with a "PUSH.W          {R4-R11,LR}" so I added a "POP.W           {R4-R11,PC}; NOP" at the end of the shellcode.
 
-	You can use converter at http://armconverter.com/ to create the code or use gcc again.
+You can use converter at http://armconverter.com/ to create the code or use gcc again.
 
-	Look at the file init_patched.txt to see the full patched function and its epilogue.
+Look at the file init_patched.txt to see the full patched function and its epilogue.
 
-	Now you have to load the new init file. To speed up things, you have to make init sleep so it isn't executing bootchart_sample while we are overwriting it.
-	The best way is to turn off the screen and wait 10 seconds. Then dirtyc0w it.
+Now you have to load the new init file. To speed up things, you have to make init sleep so it isn't executing bootchart_sample while we are overwriting it.
+The best way is to turn off the screen and wait 10 seconds. Then dirtyc0w it.
 
-	An alternative way is to follow the 3 steps procedure at redtile.io
+An alternative way is to follow the 3 steps procedure at redtile.io
 
 # Replace policy
 
-  Download the android version of libsepol and compile it.
-  Download the sepolicy-inject and compile it.
+Download the android version of libsepol and compile it.
+Download the sepolicy-inject and compile it.
 
-	Notice that sepolicy-inject has more functions that the ones listed in the README (look at the --auto and --not parameters)
+Notice that sepolicy-inject has more functions that the ones listed in the README (look at the --auto and --not parameters)
+Download your /sepolicy
+Patch it to add your permissions
+Upload it to /data/local/tmp/sepolicy
 
-  Download your /sepolicy
-	Patch it to add your permissions
-	Upload it to /data/local/tmp/sepolicy
-
-	Now launch "adb logcat" log for audit message. You should see a message indicating that your policy is loaded
+Now launch "adb logcat" log for audit message. You should see a message indicating that your policy is loaded
 
 	
