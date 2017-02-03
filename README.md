@@ -48,6 +48,7 @@ Once you have access to init, copy it on your sdcard, then use adb pull to recov
 # Patch /init
 
  This is the difficult part, you need to find the function bootchart_sample() to patch it.
+ I wrote a shellcode that loads a new policy from /data/local/tmp/sepolicy and loads it into the system
 
  Open /init in ida pro and compare it with the source code.
  For android marshmallow the source is on google repository:
