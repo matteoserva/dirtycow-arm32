@@ -96,4 +96,15 @@ Upload it to /data/local/tmp/sepolicy
 
 Now launch "adb logcat" log for audit message. You should see a message indicating that your policy is loaded
 
+# Create the privileged context
+
+(to be completed)
+go in /sepolicy_generator and modify your policy
+
+# The su daemon
+
+(to be completed )
 	
+create a folder as system_data_file, readable by everyone, and put it /data/local/tmp2 so everyone can use it.
+replace dnsmasq with the su daemon and start it
+use your su client
