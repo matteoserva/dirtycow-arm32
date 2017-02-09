@@ -1,0 +1,44 @@
+create super
+allow super shell_exec file entrypoint
+allow { dnsmasq shell untrusted_app } super process transition
+allow super { dnsmasq shell untrusted_app } fd use
+allow super { dnsmasq shell untrusted_app } process sigchld
+allow super shell_exec file read
+allow { dnsmasq shell untrusted_app } super process { noatsecure rlimitinh siginh }
+allow super devpts chr_file { read write ioctl }
+allow super shell_data_file dir { write search }
+allow super { dnsmasq shell untrusted_app } tcp_socket { read write getattr ioctl }
+
+typetrans dnsmasq shell_exec process super
+typetrans shell shell_exec process super
+typetrans untrusted_app shell_exec process super
+
+
+allow super * file { read write open execute execute_no_trans }
+allow super * dir { search open getattr  }
+
+allow super super process { setpgid sigchld fork }
+allow super super capability2 { mac_override mac_admin syslog wake_alarm block_suspend }
+allow super super fifo_file { read write }
+allow super netd fd use
+allow super netd udp_socket { read write }
+allow super netd fifo_file { read write }
+allow super netd unix_stream_socket { read write }
+allow super netd unix_dgram_socket { read write }
+
+allow super super capability { dac_override setfcap setuid setgid setpcap dac_read_search fowner fsetid kill ipc_owner }
+allow super app_data_file dir { search open read write }
+allow super app_data_file file { open read write }
+allow super super fd use
+
+allow super super process { fork transition sigchld sigkill sigstop signull signal ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setexec setfscreate noatsecure siginh setrlimit rlimitinh dyntransition setcurrent execmem execstack execheap setkeycreate setsockcreate }
+allow super kernel security { setenforce }
+
+attradd super domain
+attradd super mlstrustedsubject
+
+
+allow super shell_data_file dir { search open read write add_name create setattr }
+allow super { runas_exec shell_data_file } file { open execute execute_no_trans read write create setattr  getattr }
+
+allow super kernel system syslog_read
