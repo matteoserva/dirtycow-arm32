@@ -105,6 +105,9 @@ go in /sepolicy_generator and modify your policy
 
 (to be completed )
 	
-create a folder as system_data_file, readable by everyone, and put it /data/local/tmp2 so everyone can use it.
-replace dnsmasq with the su daemon and start it
-use your su client
+The SuperDaemon must be launched as root. I replaced dnsmasq with it so I can start the daemon by activating wifi tethering.
+
+Once the daemon is activated, you can run ./su (the same file) to connect to the daemon and get root permission.
+
+Create a folder as system_data_file, readable by everyone, and put it /data/local/tmp2 so everyone can use it.
+
