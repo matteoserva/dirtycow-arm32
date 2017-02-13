@@ -1,44 +1,53 @@
 create super
-allow super shell_exec file entrypoint
-allow { dnsmasq shell untrusted_app } super process transition
-allow super { dnsmasq shell untrusted_app } fd use
-allow super { dnsmasq shell untrusted_app } process sigchld
-allow super shell_exec file read
-allow { dnsmasq shell untrusted_app } super process { noatsecure rlimitinh siginh }
-allow super devpts chr_file { read write ioctl }
-allow super shell_data_file dir { write search }
-allow super { dnsmasq shell untrusted_app } tcp_socket { read write getattr ioctl }
-
-typetrans dnsmasq shell_exec process super
-typetrans shell shell_exec process super
-typetrans untrusted_app shell_exec process super
-
-
-allow super * file { read write open execute execute_no_trans }
-allow super * dir { search open getattr  }
-
-allow super super process { setpgid sigchld fork }
-allow super super capability2 { mac_override mac_admin syslog wake_alarm block_suspend }
-allow super super fifo_file { read write }
-allow super netd fd use
-allow super netd udp_socket { read write }
-allow super netd fifo_file { read write }
-allow super netd unix_stream_socket { read write }
-allow super netd unix_dgram_socket { read write }
-
-allow super super capability { dac_override setfcap setuid setgid setpcap dac_read_search fowner fsetid kill ipc_owner }
-allow super app_data_file dir { search open read write }
-allow super app_data_file file { open read write }
-allow super super fd use
-
-allow super super process { fork transition sigchld sigkill sigstop signull signal ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setexec setfscreate noatsecure siginh setrlimit rlimitinh dyntransition setcurrent execmem execstack execheap setkeycreate setsockcreate }
-allow super kernel security { setenforce }
-
 attradd super domain
 attradd super mlstrustedsubject
 
 
-allow super shell_data_file dir { search open read write add_name create setattr }
-allow super { runas_exec shell_data_file } file { open execute execute_no_trans read write create setattr  getattr }
 
-allow super kernel system syslog_read
+# per switchare
+     allow { dnsmasq shell } super process { transition dyntransition }
+
+#auto transizione
+#allow super shell_exec file entrypoint
+#typetrans  shell  shell_exec process super
+#typetrans  dnsmasq shell_exec process super
+
+# per avviare il demone
+     allow super dnsmasq fd use
+     allow super dnsmasq tcp_socket { getattr read ioctl write }
+
+# per aprire un terminale dal demone
+     allow super devpts chr_file { open read write ioctl }
+     allow super super fifo_file { read write getattr }
+
+#per connettersi via unix stream
+     allow { shell untrusted_app} dnsmasq unix_stream_socket { connectto read write }
+     allow super dnsmasq unix_stream_socket { read write }
+
+#temporaneo, per permettere alla app di connettersi
+#     allow appdomain shell_data_file file { open read execute execute_no_trans }
+#     allow untrusted_app dnsmasq unix_stream_socket { connectto read write }
+
+# esecuzione di comandi
+      allow super { shell_exec toolbox_exec } file { execute open read execute_no_trans }
+
+# lettura scrittura dei file vari
+     allow super { app_data_file shell_data_file system_data_file } dir { search read write open add_name remove_name create setattr }
+     allow super { init_exec selinuxfs appdomain logcat_exec shell_data_file app_data_file system_data_file system_file } file { append create read write open execute execute_no_trans unlink link rename setattr }
+     allow super system_data_file lnk_file { create }
+     allow super { shell_data_file system_data_file } lnk_file { relabelfrom unlink }
+     allow super { shell_data_file system_data_file } file { relabelfrom }
+     allow super system_file file { relabelto }
+     allow super system_file lnk_file { relabelto }
+
+# poteri al super
+     allow super super process { fork signal sigchld setpgid }
+     allow super super capability { dac_override fowner sys_module kill net_raw }
+     allow super super capability2 { syslog }
+     allow super super rawip_socket { create }
+     allow super kernel system { syslog_read }
+     allow super kernel security { load_policy }
+     allow super super file write
+
+# sending AT commands
+     allow super { smd_device gadget_serial_device } chr_file { open read write }
