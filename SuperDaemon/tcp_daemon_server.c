@@ -26,7 +26,8 @@ int tcp_daemon_create(int argc, char**argv)
 	// set struct values
 	my_addr.sin_family = AF_INET; // 2
 	my_addr.sin_port = htons(port); // port number
-	my_addr.sin_addr.s_addr = INADDR_ANY; // 0 fill with the local IP
+	inet_pton(AF_INET,"127.0.0.1",&my_addr.sin_addr.s_addr);
+	//my_addr.sin_addr.s_addr = INADDR_ANY; // 0 fill with the local IP
 
 	bind(sockfd, (struct sockaddr *) &my_addr, sizeof(my_addr));
 
