@@ -17,9 +17,20 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
-int scalataRiuscita();
+
 int provaScalata();
 int fork_zero_fucks();
+int move_data(int in, int out);
 int pump_streams_sync(int in1,int out1,int in2, int out2);
 int pump_streams_sync_clean(int in1,int out1,int in2, int out2);
+void replace_standard_streams(int input,int output);
+int utils_create_pipe_pair(int *master, int *slave);
+
+
+enum COMM_TYPE { COMM_NONE,COMM_PTY,COMM_PIPE };
+void closeUnwantedCommFd(int commType, int* storage, int* inpOut,int isMaster);
+int openCommFd(int wantedType,int* storage);
+
+
+
 #endif

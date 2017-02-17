@@ -7,11 +7,14 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include "client.h"
-#define PORT 11112
-int tcp_daemon_create(int argc, char**argv)
+
+#include "connector.h"
+
+
+int tcp_daemon_create(char * ipAddress, unsigned short port)
 {
 	int  sockfd;
-	int port = PORT;
+	
 	struct sockaddr_in my_addr;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -26,7 +29,7 @@ int tcp_daemon_create(int argc, char**argv)
 	// set struct values
 	my_addr.sin_family = AF_INET; // 2
 	my_addr.sin_port = htons(port); // port number
-	inet_pton(AF_INET,"127.0.0.1",&my_addr.sin_addr.s_addr);
+	inet_pton(AF_INET,ipAddress,&my_addr.sin_addr.s_addr);
 	//my_addr.sin_addr.s_addr = INADDR_ANY; // 0 fill with the local IP
 
 	bind(sockfd, (struct sockaddr *) &my_addr, sizeof(my_addr));
@@ -39,14 +42,14 @@ int tcp_daemon_create(int argc, char**argv)
 
 
 
-int tcp_client_create(int argc, char**argv)
+int tcp_client_create(char * ipAddress, unsigned short port)
 {
 	struct sockaddr_in sa;
 	memset(&sa, 0, sizeof(struct sockaddr_in));
 	sa.sin_family = AF_INET;
-	inet_pton(AF_INET,"127.0.0.1",&sa.sin_addr.s_addr);
+	inet_pton(AF_INET,ipAddress,&sa.sin_addr.s_addr);
 	
-	sa.sin_port = htons(PORT);
+	sa.sin_port = htons(port);
 	
 	
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
