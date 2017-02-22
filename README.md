@@ -111,3 +111,9 @@ Once the daemon is activated, you can run ./su (the same file) to connect to the
 
 Create a folder as system_data_file, readable by everyone, and put it /data/local/tmp2 so everyone can use it.
 
+# Make the new policy permanent
+
+( to be completed )
+save the new policy in /data/security or /data/security/current
+
+Make it survive a OS update
