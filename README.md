@@ -114,6 +114,12 @@ Create a folder as system_data_file, readable by everyone, and put it /data/loca
 # Make the new policy permanent
 
 ( to be completed )
-save the new policy in /data/security or /data/security/current
+* save the new policy in /data/security or /data/security/current to make it autoload at boot
+* the new policy should allow writing /sys/kernel/uevent_helper
+* the new policy should allow launching adb client
+* create cap_setuid binary in /data/enc_user that writes uevent_helper
+* from user, setprop service.adb.tcp.port, connect to self, launch setuid binary, write uevent_helper
+* from uevent_helper spawn su daemon
+
 
 Make it survive a OS update
