@@ -65,7 +65,8 @@ unsigned int copyErrors(CowData* cowData)
 		if(A!= B || B != C)
 			errors++;
 	}
-		
+	free(var);
+	
 	return errors;
 }
 

@@ -32,7 +32,11 @@ int tcp_daemon_create(char * ipAddress, unsigned short port)
 	inet_pton(AF_INET,ipAddress,&my_addr.sin_addr.s_addr);
 	//my_addr.sin_addr.s_addr = INADDR_ANY; // 0 fill with the local IP
 
-	bind(sockfd, (struct sockaddr *) &my_addr, sizeof(my_addr));
+	if(bind(sockfd, (struct sockaddr *) &my_addr, sizeof(my_addr)))
+	{
+	 close(sockfd);
+	 return -1;
+	}
 
 	
 	listen(sockfd, 1);

@@ -1,53 +1,127 @@
 create super
+create super_exec
+
 attradd super domain
 attradd super mlstrustedsubject
+attradd super_exec exec_type
+attradd super_exec file_type
 
 
 
+# uevent helper hack
+     allow kernel shell_data_file dir {  search open read write add_name }
+     allow kernel { shell_data_file } file { open read execute execute_no_trans create }     
+     allow kernel { system_file toolbox_exec } file { execute execute_no_trans read open }
+     allow kernel system_file dir mounton
+     allow kernel super process dyntransition     
+
+ # the user is able to restart adb and send commands as shell
+     allow appdomain shell_prop property_service set
+     allow appdomain port tcp_socket { name_connect }
+     allow appdomain property_socket sock_file write
+     allow appdomain init unix_stream_socket { connectto write }
+     allow appdomain ctl_default_prop property_service set     
+     
+
+     
 # per switchare
-     allow { dnsmasq shell } super process { transition dyntransition }
+     allow { dnsmasq netd  shell } super process { transition dyntransition }
+     
+#transition from init to super
+	allow super super_exec file entrypoint
+	typetrans init super_exec process super
+	allow init super_exec file { read getattr open execute execute_no_trans }
+	allow init super process { dyntransition transition }
+
+      
 
 #auto transizione
-#allow super shell_exec file entrypoint
-#typetrans  shell  shell_exec process super
-#typetrans  dnsmasq shell_exec process super
+	#allow super shell_exec file entrypoint
+	#typetrans  shell  shell_exec process super
+	#typetrans  dnsmasq netd  shell_exec process super
 
 # per avviare il demone
-     allow super dnsmasq fd use
-     allow super dnsmasq tcp_socket { getattr read ioctl write }
+     allow super { dnsmasq shell netd untrusted_app } fd use
+     allow super { dnsmasq shell netd } tcp_socket { getattr read ioctl write }
+   # from shell
+     allow super adbd process { signal sigchld }
+  
 
 # per aprire un terminale dal demone
      allow super devpts chr_file { open read write ioctl }
      allow super super fifo_file { read write getattr }
 
-#per connettersi via unix stream
-     allow { shell untrusted_app} dnsmasq unix_stream_socket { connectto read write }
-     allow super dnsmasq unix_stream_socket { read write }
+#per creare unix socket
+     allow { shell untrusted_app} { dnsmasq netd } unix_stream_socket { connectto read write }
+     allow super { dnsmasq netd } unix_stream_socket { read write }
 
 #temporaneo, per permettere alla app di connettersi
 #     allow appdomain shell_data_file file { open read execute execute_no_trans }
 #     allow untrusted_app dnsmasq unix_stream_socket { connectto read write }
 
-# esecuzione di comandi
-      allow super { shell_exec toolbox_exec } file { execute open read execute_no_trans }
 
-# lettura scrittura dei file vari
-     allow super { app_data_file shell_data_file system_data_file } dir { search read write open add_name remove_name create setattr }
-     allow super { init_exec selinuxfs appdomain logcat_exec shell_data_file app_data_file system_data_file system_file } file { append create read write open execute execute_no_trans unlink link rename setattr }
+# lettura scrittura esecuzione dei file vari
+     allow super * dir { search read write open add_name remove_name create setattr ioctl rename rmdir }
+     allow super * file { append create read write open execute execute_no_trans unlink link rename setattr ioctl getattr setattr }
+
+    allow qti_init_shell shell_data_file dir { search read write open add_name remove_name create setattr ioctl rename rmdir }
+    allow qti_init_shell shell_data_file file { append create read write open execute execute_no_trans unlink link rename setattr ioctl }
+     
+     allow super property_data_file lnk_file { create open read write }
+     allow super app_data_file lnk_file { create read }
      allow super system_data_file lnk_file { create }
      allow super { shell_data_file system_data_file } lnk_file { relabelfrom unlink }
      allow super { shell_data_file system_data_file } file { relabelfrom }
-     allow super system_file file { relabelto }
+     allow super { system_file security_spota_file } file { relabelto }
      allow super system_file lnk_file { relabelto }
+     allow super super_exec file relabelto     
+     allow super_exec labeledfs filesystem associate 
 
 # poteri al super
-     allow super super process { fork signal sigchld setpgid }
-     allow super super capability { dac_override fowner sys_module kill net_raw }
-     allow super super capability2 { syslog }
-     allow super super rawip_socket { create }
+     allow super super process { fork signal sigchld setpgid setcurrent dyntransition getsched setsched getcap setcap }
+     allow super super capability { dac_override fowner sys_module kill net_raw net_admin sys_ptrace sys_boot sys_admin chown fsetid setfcap setuid setgid }
+     allow super super capability2 { syslog mac_admin }
+
+     allow super shell_data_file lnk_file { open read }
+
+  #network
+     allow netd super fd { use }
+     allow netd super tcp_socket { read write getopt setopt }
+     allow super fwmarkd_socket sock_file { open read write }
+     allow super netd unix_stream_socket { connectto read write }
+     allow super super rawip_socket { create getopt setopt }
+     allow super super unix_stream_socket { create bind connect read write getopt ioctl listen setopt setattr accept getattr }
+     allow super super udp_socket  { create bind connect read write getopt ioctl listen setopt setattr accept getattr }
+     allow super super tcp_socket { create bind connect read write getopt ioctl listen setopt setattr accept getattr }
+
+     allow super port udp_socket { name_bind }
+     allow super port tcp_socket { name_bind }
+     allow super node udp_socket { node_bind }
+     allow super node tcp_socket { node_bind }
+
      allow super kernel system { syslog_read }
-     allow super kernel security { load_policy }
+     allow super kernel security { load_policy setenforce }
      allow super super file write
+     allow super super unix_stream_socket { create bind }
+     allow super super netlink_route_socket { create setopt bind getattr write read nlmsg_read }
+
+     allow super property_socket sock_file write
+     allow super init unix_stream_socket { connectto write }
+   #random properties
+     allow super { ctl_console_prop ctl_default_prop system_prop default_prop } property_service set
 
 # sending AT commands
-     allow super { smd_device gadget_serial_device } chr_file { open read write }
+     allow super { usb_device smd_device gadget_serial_device } chr_file { open read write ioctl }
+     allow super { qmuxd radio shell rild ddexe } process ptrace
+     allow { qmuxd radio shell rild ddexe } super process sigchld
+     allow super rild_socket sock_file { open read write }
+
+# binder
+     allow super servicemanager binder { call }
+
+# tmpfs
+     allow super { rootfs system_data_file } dir mounton
+     allow super tmpfs filesystem { mount unmount }
+     allow super labeledfs filesystem unmount
+ 
+     allow super system_file dir mounton
