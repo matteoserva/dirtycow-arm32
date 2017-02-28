@@ -173,13 +173,37 @@ int utils_pty_prepare_daemon_child(int slave_ptx)
 	return 0;
 }
 
-int utils_pty_set_columns(int master_ptx, int col)
+int utils_pty_get_terminal_size(int master_ptx, int *row, int *col)
 {
+   *row = -1;
+   *col = -1;
+   
+   if(!isatty(master_ptx))
+	return -1;
+    struct winsize w;
+   if (ioctl(master_ptx, TIOCGWINSZ, &w) == -1)
+     return -1;
+   
+   *row = w.ws_row;
+   *col = w.ws_col;
+   return 0;
+  
+}
+
+int utils_pty_set_terminal_size(int master_ptx, int row, int col)
+{
+  if(row <= 0 && col <= 0)
+    return 0;
+  
+  
   if(!isatty(master_ptx))
 		return -1;
 	      struct winsize w;
         	if (ioctl(master_ptx, TIOCGWINSZ, &w) != -1) {
-		w.ws_col = col;
+		 if(col > 0)
+		    w.ws_col = col;
+		 if(row > 0)
+		    w.ws_row = row;
 	        ioctl(master_ptx, TIOCSWINSZ, &w);
 
 	        }

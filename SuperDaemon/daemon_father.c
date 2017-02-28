@@ -26,8 +26,16 @@ int daemon_father_start_child(char ** params)
 static int daemon_father_loop(void* configData, char*preBuffer, int preBufferSize)
 {
 	int interactive = config_data_get_interactive(configData);
-	//printf("loop interactive %d ,  prebuffer %d\n\n\n\n",config_data_get_interactive(configData),preBufferSize);
+	
 	fflush(stdout);
+	
+	char * wanted_cwd = config_data_get_current_dir(configData);
+	if(wanted_cwd)
+	{
+	    chdir(wanted_cwd); 
+	}
+	
+	
 	if(preBufferSize == 0 && interactive == 0)
 	{
 		return daemon_father_start_child(config_data_get_params(configData));
@@ -52,7 +60,10 @@ static int daemon_father_loop(void* configData, char*preBuffer, int preBufferSiz
 	
 	if(cpid > 0)
 	{
-		utils_pty_set_columns(usableCommFd[1],60);
+	        int term_rows = 0;
+		int term_cols = 60;
+		config_data_get_terminal_size(configData,&term_rows,&term_cols);
+		utils_pty_set_terminal_size(usableCommFd[1],term_rows,term_cols);
 		if(preBufferSize > 0)
 			write(usableCommFd[1],preBuffer,preBufferSize);
 		
