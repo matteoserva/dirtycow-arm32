@@ -123,3 +123,10 @@ Create a folder as system_data_file, readable by everyone, and put it /data/loca
 
 
 Make it survive a OS update
+
+# alternative dirtycow targets.
+
+* you can dirtycow the default /sepolicy and trigger a reload
+* you can dirtycow the default libc or any shared library and wait for a process to call your code
+* you can live patch netd to fork and exec to your shell
+* you can dirtycow a suid file and run it from gdb which has setuid capability
