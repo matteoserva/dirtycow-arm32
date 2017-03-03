@@ -6,7 +6,11 @@ attradd super mlstrustedsubject
 attradd super_exec exec_type
 attradd super_exec file_type
 
+# fuse filesystem
 
+      allow super fuse_device chr_file { open read write }
+      allow super shell_data_file dir { mounton }
+      allow super fuse filesystem { mount unmount }
 
 # ptrace permission
       allow super * process { signull ptrace }
@@ -16,6 +20,9 @@ attradd super_exec file_type
 
 # service manager
       allow super servicemanager service_manager { list }
+      allow super * service_manager { find }
+      allow servicemanager super binder { transfer }
+      allow super * binder { call }
 
 # uevent helper hack
       allow kernel shell_data_file dir {  search open read write add_name }
@@ -86,7 +93,7 @@ attradd super_exec file_type
       allow super_exec labeledfs filesystem associate 
 
 # poteri al super
-      allow super super process { fork signal sigchld setpgid setcurrent dyntransition getsched setsched getcap setcap }
+      allow super super process { fork signal sigchld setpgid setcurrent dyntransition getsched setsched getcap setcap sigkill }
       allow super super capability { dac_override fowner sys_module kill net_raw net_admin sys_ptrace sys_boot sys_admin chown fsetid setfcap setuid setgid }
       allow super super capability2 { syslog mac_admin }
 
