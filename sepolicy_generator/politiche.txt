@@ -93,11 +93,14 @@ attradd super_exec file_type
       allow super_exec labeledfs filesystem associate 
 
 # poteri al super
-      allow super super process { fork signal sigchld setpgid setcurrent dyntransition getsched setsched getcap setcap sigkill }
+      allow super super process { setrlimit fork signal sigchld setpgid setcurrent dyntransition getsched setsched getcap setcap sigkill }
       allow super super capability { dac_override fowner sys_module kill net_raw net_admin sys_ptrace sys_boot sys_admin chown fsetid setfcap setuid setgid }
       allow super super capability2 { syslog mac_admin }
 
-      
+#tcpdump
+      allow super super socket { create ioctl }
+      allow super super netlink_socket { write create read }
+      allow super super packet_socket { ioctl create setopt bind getopt read write }
 
   #network
       allow netd super fd { use }
@@ -108,6 +111,8 @@ attradd super_exec file_type
       allow super super unix_stream_socket { create bind connect read write getopt ioctl listen setopt setattr accept getattr }
       allow super super udp_socket  { create bind connect read write getopt ioctl listen setopt setattr accept getattr }
       allow super super tcp_socket { create bind connect read write getopt ioctl listen setopt setattr accept getattr }
+
+      allow super port tcp_socket { name_connect }
 
       allow super port udp_socket { name_bind }
       allow super port tcp_socket { name_bind }
@@ -122,6 +127,9 @@ attradd super_exec file_type
 
       allow super property_socket sock_file write
       allow super init unix_stream_socket { connectto write }
+
+
+
    
    # dns resolver
       allow super dnsproxyd_socket sock_file { write }

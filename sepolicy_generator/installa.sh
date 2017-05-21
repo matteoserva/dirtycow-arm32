@@ -4,9 +4,9 @@ while read p; do
 
    p=`echo "${p}"|grep -o '^[^#]*'`
    if [ ! -z "$p" ];then
-#echo "${p}"
+   #echo "${p}"
 
-  	# echo ./sepolicy-inject --load se2 --save se2 "$p"
+  	#echo ./sepolicy-inject --load se2 --save se2 "$p"
   	./sepolicy-inject --load se2 --save se2 "$p" | grep -v aggiu | grep -v inser
 
 fi

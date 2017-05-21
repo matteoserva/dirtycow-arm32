@@ -7,6 +7,7 @@
 #include <unistd.h> //close
 #include "utils_pty.h"
 #include "config_messenger.h"
+#include <stdlib.h> //setenv
 
  char *default_exe1[] = {"/system/bin/sh", NULL};
  char *default_exe2[] = {"/bin/bash", NULL};
@@ -15,7 +16,7 @@
 
 int daemon_father_start_child(char ** params)
 {
-	
+
 	daemon_child_execute(params);
 	daemon_child_execute(default_exe1);
 	daemon_child_execute(default_exe2);
@@ -23,39 +24,55 @@ int daemon_father_start_child(char ** params)
 }
 
 
+static void daemon_father_prepare_env()
+{
+
+	setenv("ANDROID_ROOT","/system",0);
+	setenv("ANDROID_DATA","/data",0);
+	setenv("TMPDIR","/data/local/tmp",1);
+	setenv("HOME", "/data/local/tmp", 1);
+	setenv("PATH","/data/local/tmp/bin:/root/sbin:/root/bin:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin",1);
+	unsetenv("SEQNUM");
+	unsetenv("SUBSYSTEM");
+	unsetenv("ACTION");
+	unsetenv("USB_STATE");
+	
+}
+
 static int daemon_father_loop(void* configData, char*preBuffer, int preBufferSize)
 {
 	int interactive = config_data_get_interactive(configData);
-	
+
 	fflush(stdout);
-	
+
 	char * wanted_cwd = config_data_get_current_dir(configData);
 	if(wanted_cwd)
 	{
 	    chdir(wanted_cwd); 
 	}
-	
-	
+
+	daemon_father_prepare_env();
+
 	if(preBufferSize == 0 && interactive == 0)
 	{
 		return daemon_father_start_child(config_data_get_params(configData));
 	}
-	
+
 	int commFd[4];
-	
+
 	int commType = openCommFd(interactive?COMM_PTY:COMM_PIPE,commFd);
-	
+
 	if(commType == COMM_NONE)
 	{
 		return daemon_father_start_child(config_data_get_params(configData));
 	}
-	
+
 	int usableCommFd[2];
-	
+
 	int cpid = fork();
 	if(cpid < 0)
 		return daemon_father_start_child(config_data_get_params(configData));
-	
+
 	closeUnwantedCommFd(commType,commFd,usableCommFd,cpid>0?1:0);
 	
 	if(cpid > 0)
@@ -101,15 +118,15 @@ static void* create_default_config_data()
 int daemon_father_run(int fd,void* _configData)
 {
 	replace_standard_streams(fd,fd);
-	
+
 	provaScalata();
-	
+
 	/* ORA TENTO DI CAPIRE SE CLIENT */
-	
+
 	char buffer[16];
-	
+
 	void* configData = NULL;
-	
+
 	fd_set rfds;
 	struct timeval tv;
 	tv.tv_sec=0;
@@ -117,17 +134,17 @@ int daemon_father_run(int fd,void* _configData)
 	FD_ZERO(&rfds);
 	FD_SET(0,&rfds);
 	int pronti = select(1, &rfds, NULL, NULL, &tv);
-	
+
 	if(pronti == 0)
 	  return daemon_father_loop(create_default_config_data(),NULL,0);
-	
-	
+
+
 	int letti = read(0,buffer,1);
 	if(letti < 1)
 	{
 	   return -1;
 	}
-	
+
 	if(buffer[0] == 0)
 	{
 	  configData = config_messenger_receive(create_default_config_data(),0);
@@ -136,13 +153,13 @@ int daemon_father_run(int fd,void* _configData)
 	    return -1;
 	  }
 	  letti = 0;
-	  
+
 	}
 	else
 	{
 	  configData = create_default_config_data();
 	}
-	
+
 	return daemon_father_loop(configData,buffer,letti);
 
 }
